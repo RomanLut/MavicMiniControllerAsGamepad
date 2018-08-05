@@ -63,41 +63,55 @@ void Joystick::update(int l_hor, int l_ver, int r_hor, int r_ver, int lever_left
 	r_hor *= 16;
 	r_ver *= 16;
 	camera *= -16; // negative multiplication to make the value feel natural (left = negative | right = positive)
+	
+	// center all sticks for users who fly with no springs at all (for calibration or to scratch your nose)
+	// set camera to max (right) and flip left and right switches down fully to center sticks data.
 
-	// Read values from left lever
-	// -780 = 'OFF' position | 0 = 'CL' position | 780 = 'HL' position
-	if (lever_left == -780) {
-		button_1 = true;
-		button_2 = false;
-		button_3 = false;
-	}
-	else if (lever_left == 780) {
-		button_1 = false;
-		button_2 = false;
-		button_3 = true;
-	} // else remain as before, sometimes this value is a bit weird
-	else if (lever_left == 0) {
-		button_1 = false;
-		button_2 = true;
-		button_3 = false;
-	}
+	int range_max = 32000;
+	int center_sticks = range_max / 2;
 
-	// Read values from right lever
-	// -780 = 'GPS' position | 0 = 'ATTI' position | 780 = 'ATTI' position
-	if (lever_right == -780) {
-		button_4 = true;
-		button_5 = false;
-		button_6 = false;
+	if ((camera == range_max && lever_left > 0) && (lever_right > 0)) {
+		l_hor = center_sticks;
+		l_ver = center_sticks;
+		r_hor = center_sticks;
+		r_ver = center_sticks;
 	}
-	else if (lever_right == 780) {
-		button_4 = false;
-		button_5 = false;
-		button_6 = true;
-	} // else remain as before, sometimes this value is a bit weird
 	else {
-		button_4 = false;
-		button_5 = true;
-		button_6 = false;
+		// Read values from left lever
+		// -numbers = 'OFF' position | 0 = 'CL' position | +numbers = 'HL' position
+		if (lever_left < 0) {
+			button_1 = true;
+			button_2 = false;
+			button_3 = false;
+		}
+		else if (lever_left > 0) {
+			button_1 = false;
+			button_2 = false;
+			button_3 = true;
+		} // else remain as before, sometimes this value is a bit weird
+		else {
+			button_1 = false;
+			button_2 = true;
+			button_3 = false;
+		}
+
+		// Read values from right lever
+		// -numbers = 'GPS' position | 0 = 'ATTI' position | +numbers = 'ATTI' position
+		if (lever_right < 0) {
+			button_4 = true;
+			button_5 = false;
+			button_6 = false;
+		}
+		else if (lever_right > 0) {
+			button_4 = false;
+			button_5 = false;
+			button_6 = true;
+		} // else remain as before, sometimes this value is a bit weird
+		else {
+			button_4 = false;
+			button_5 = true;
+			button_6 = false;
+		}
 	}
 
 	if (log)

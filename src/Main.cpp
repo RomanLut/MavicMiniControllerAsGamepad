@@ -46,7 +46,7 @@ void run(char* portName, int stickId, int logging) {
 	printf("\nEverything is ready\n\n");
 	s.WriteData(initData, 34);
 
-	printf("Running...\nPress ESC to quit\n");
+	printf("Running...\nPress END key to quit\n");
 	Sleep(2000);
 
 	while (s.IsConnected() && shouldRun)
@@ -68,12 +68,13 @@ void run(char* portName, int stickId, int logging) {
 
 			// update our virtual joystick
 			j.update(left_horizontal, left_vertical, right_horizontal, right_vertical, left_lever, right_lever, camera);
+
 		}
 
 
-		if (GetAsyncKeyState(VK_ESCAPE)) {
+		if (GetAsyncKeyState(VK_END)) {
 			shouldRun = false;
-			printf("\n\nDetected ESC, quitting...\n");
+			printf("\n\nDetected END key, quitting...\n");
 		}
 
 		Sleep(10);
@@ -85,20 +86,19 @@ int main() {
 	std::string in;
 	int portNr, stickId, logging;
 
-
-	printf("Select port number (default COM \"3\"): ");
+	printf("\n  If confused, please read the readme file\n\n   NOTE: DJI_WIN Driver must be installed.\n   NOTE: DJI Assistant 2 Must be installed - Version 1.0.5 tested.\n   NOTE: Vjoy must be installed.\n\n  Device manager > View > Show Hidden > Ports COM & LPT\n  > DJI USB Virtual COM(COM#) <- THIS NUMBER!\n\n  Type port number here then press enter (default set to port 6): ");
 	std::getline(std::cin, in);
 	portNr = atoi(in.c_str());
 
 	if (portNr < 1) {
-		portNr = 3;
+		portNr = 6;
 	}
 
 	char port[100];
 	sprintf_s(port, "COM%d", portNr);
 
 
-	printf("Select vJoy configuration (default \"1\"): ");
+	printf("\n\n  Select vJoy configuration (default set to 1): ");
 	std::getline(std::cin, in);
 	stickId = atoi(in.c_str());
 
@@ -107,7 +107,7 @@ int main() {
 	}
 
 
-	printf("Disable logging? 1 for off (default \"0\"): ");
+	printf("\n\n  Disable logging? 1 for off 0 for on (default set to 0): ");
 	std::getline(std::cin, in);
 	logging = atoi(in.c_str());
 
@@ -115,9 +115,9 @@ int main() {
 		logging = 1;
 	}
 
-	printf("Starting...\n\n");
+	printf("  Starting...\n\n");
 	run(port, stickId, logging);
-	printf("Closing down...\n\n");
+	printf("  Closing down...\n\n");
 
 
 	system("pause");
