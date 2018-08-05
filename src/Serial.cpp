@@ -6,7 +6,7 @@
 
 Serial::Serial(char *portName)
 {
-	printf("Creating serial connection\n");
+	printf("  Creating serial connection\n");
 	//We're not yet connected
 	this->connected = false;
 
@@ -26,17 +26,17 @@ Serial::Serial(char *portName)
 		if (GetLastError() == ERROR_FILE_NOT_FOUND){
 
 			//Print Error if necessary
-			printf("ERROR: Handle was not attached. Reason: %s not available.\n", portName);
+			printf("  ERROR: Handle was not attached. Reason: %s not available.\n", portName);
 
 		}
 		else
 		{
-			printf("Couldn't connect to COM port, unknown why..\n");
+			printf("  Couldn't connect to COM port, unknown why..\n");
 		}
 	}
 	else
 	{
-		printf("Found serial port\n");
+		printf("  Found serial port\n");
 		//If connected we try to set the comm parameters
 		DCB dcbSerialParams = { 0 };
 
@@ -44,7 +44,7 @@ Serial::Serial(char *portName)
 		if (!GetCommState(this->hSerial, &dcbSerialParams))
 		{
 			//If impossible, show an error
-			printf("failed to get current serial parameters!\n");
+			printf("  failed to get current serial parameters!\n");
 		}
 		else
 		{
@@ -57,11 +57,11 @@ Serial::Serial(char *portName)
 			//Set the parameters and check for their proper application
 			if (!SetCommState(hSerial, &dcbSerialParams))
 			{
-				printf("ALERT: Could not set Serial Port parameters\n");
+				printf("  ALERT: Could not set Serial Port parameters\n");
 			}
 			else
 			{
-				printf("Connected to serial port\n");
+				printf("  Connected to serial port\n");
 				//If everything went fine we're connected
 				this->connected = true;
 				//Sleep(200);

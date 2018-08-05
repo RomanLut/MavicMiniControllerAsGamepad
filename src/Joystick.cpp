@@ -8,43 +8,43 @@ Joystick::Joystick(int id, int logging)
 		log = true;
 	}
 
-	printf("Creating vJoy connection\n");
+	printf("  Creating vJoy connection\n");
 
 	if (!vJoyEnabled()) {
-		printf("vJoy driver not enabled: Failed Getting vJoy attributes.\n");
+		printf("  vJoy driver not enabled: Failed Getting vJoy attributes.\n");
 		return;
 	} else {
-		printf("Driver found:\nVendor:%S, Product:%S, Ver:%S\n", TEXT(GetvJoyManufacturerString()), TEXT(GetvJoyProductString()), TEXT(GetvJoySerialNumberString()));
+		printf("  Driver found:\n  Vendor:%S, Product:%S, Ver:%S\n", TEXT(GetvJoyManufacturerString()), TEXT(GetvJoyProductString()), TEXT(GetvJoySerialNumberString()));
 	};
 
 	VjdStat status = GetVJDStatus(interfaceId);
 	switch (status)
 	{
 	case VJD_STAT_OWN:
-		printf("vJoy Device %d is already owned by this feeder\n", interfaceId);
+		printf("  vJoy Device %d is already owned by this feeder\n", interfaceId);
 		break;
 	case VJD_STAT_FREE:
-		printf("vJoy Device %d is free\n", interfaceId);
+		printf("  vJoy Device %d is free\n", interfaceId);
 		break;
 	case VJD_STAT_BUSY:
-		printf("vJoy Device %d is already owned by another feeder\nCannot continue\n", interfaceId);
+		printf("  vJoy Device %d is already owned by another feeder\n  !!! Cannot continue !!!\n", interfaceId);
 		return;
 	case VJD_STAT_MISS:
-		printf("vJoy Device %d is not installed or disabled\nCannot continue\n", interfaceId);
+		printf("  vJoy Device %d is not installed or disabled\n  !!! Cannot continue !!!\n", interfaceId);
 		return;
 	default:
-		printf("vJoy Device %d general error\nCannot continue\n", interfaceId);
+		printf("  vJoy Device %d general error\n  !!! Cannot continue !!!\n", interfaceId);
 		return;
 	};
 
 	if (!AcquireVJD(interfaceId)) {
-		printf("Failed to acquire vJoy Interface number %d\n", interfaceId);
+		printf("  Failed to acquire vJoy Interface number %d\n", interfaceId);
 		return;
 	}
 	else {
 		ResetVJD(interfaceId);
 		connected = true;
-		printf("Acquired vJoy Interface number %d\n", interfaceId);
+		printf("  Acquired vJoy Interface number %d\n", interfaceId);
 	}
 }
 
@@ -115,7 +115,7 @@ void Joystick::update(int l_hor, int l_ver, int r_hor, int r_ver, int lever_left
 	}
 
 	if (log)
-		printf("L vert: %-5d | L hori: %-5d | R vert: %-5d | R hori: %-5d | btn1: %-d | btn2: %-d | btn3: %-d | btn4: %-d | btn5: %-d | btn6: %-d | camera: %-d\n", l_ver, l_hor, r_ver, r_hor, button_1, button_2, button_3, button_4, button_5, button_6, camera);
+		printf("\n  mDjiController : \n\n  L vert: %-5d | L hori: %-5d | R vert: %-5d | R hori: %-5d | camera: %-5d \n  btn1: %-d | btn2: %-d | btn3: %-d | btn4: %-d | btn5: %-d | btn6: %-d \n", l_ver, l_hor, r_ver, r_hor, camera, button_1, button_2, button_3, button_4, button_5, button_6);
 
 	// Send stick values to vJoy
 	SetAxis(l_hor, interfaceId, HID_USAGE_X);
@@ -136,5 +136,5 @@ void Joystick::update(int l_hor, int l_ver, int r_hor, int r_ver, int lever_left
 Joystick::~Joystick()
 {
 	RelinquishVJD(interfaceId);
-	printf("Disconnected from joystick\n");
+	printf("  Disconnected from joystick\n");
 }
