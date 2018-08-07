@@ -57,12 +57,11 @@ void run(char* portName, int stickId, int logging) {
 	printf("\n  Everything is ready\n\n");
 	s.WriteData(initData, 34);
 
-	printf("  Running...\n  Press END key to quit\n");
-	Sleep(2000);
+	printf("  Running...\n\n  Press END key to quit\n\n");
+	Sleep(4000);
 
 	while (s.IsConnected() && shouldRun)
 	{
-		ClearScreen();
 
 		s.WriteData(pingData, 34); // write this once in a while, otherwise it stops sending? :O
 		readResult = s.ReadData(incomingData, dataLength);
@@ -79,6 +78,8 @@ void run(char* portName, int stickId, int logging) {
 
 			short camera = littleEndiansToShort(incomingData[55], incomingData[56]);
 
+			ClearScreen();
+
 			// update our virtual joystick
 			j.update(left_horizontal, left_vertical, right_horizontal, right_vertical, left_lever, right_lever, camera);
 			
@@ -89,7 +90,8 @@ void run(char* portName, int stickId, int logging) {
 			printf("\n\n  Detected END key, quitting...\n");
 		}
 
-		Sleep(10);
+
+		Sleep(20);
 	}
 
 }
@@ -97,10 +99,11 @@ void run(char* portName, int stickId, int logging) {
 
 int main() {
 
-	int portNr, stickId, logging;
+	int portNr = 0, stickId, logging;
 	int data;
 	logging = 0;
 	std::string in;
+	std::string saveSettings = "o";
 
 	// Check if settings file exists, if so, open it and plug in the info.
 	// If not, run the setup to create the settings file.
@@ -112,9 +115,7 @@ int main() {
 		else {
 			int i; i = 0;
 			while (readSettings >> data) {
-
 				i++;
-
 				switch (i) {
 				case 1: portNr = data;
 					break;
@@ -137,18 +138,18 @@ int main() {
 	}
 	else {
 
-		// No file exists, so go ahead and create one now.
-		printf("\n  !!! If you input incorrect data, delete the settings.mdji file. !!!\n\n   NOTE: DJI_WIN Driver must be installed.\n   NOTE: DJI Assistant 2 Must be installed - Version 1.0.5 tested.\n   NOTE: vJoy must be installed.\n\n  After the above is installed correctly,\n  Turn on your connected DJI Phantom 2 Controller.\n  Once your controller is on and connected, press enter.\n\n  ");
+		// No file exists, so user can input data.
+		printf("\n  !!! If you input incorrect data, delete the settings.mdji file. !!!\n\n   NOTE: DJI_WIN Driver must be installed.\n   NOTE: DJI Assistant 2 Must be installed - Version 1.0.5 tested.\n   NOTE: vJoy must be installed.\n\n   !IMPORTANT! - DJI Assistant cannot be running at the same time\n   as this program or it will not connect.\n\n  After the above is installed correctly,\n  Turn on your connected DJI Phantom 2 Controller.\n  Once your controller is on and connected, press enter.\n\n");
 
+		printf("  ");
 		system("pause");
 
 		// Clear screen to begin settings process
 		ClearScreen();
 
 
-		// BEGIN ENUMSER PORT SCAN
-
-		//Initialize COM (Required by CEnumerateSerial::UsingWMI)
+		/* Begin Enumser for auto device discovery.
+		Initialize COM (Required by CEnumerateSerial::UsingWMI) */
 		HRESULT hr = CoInitialize(nullptr);
 		if (FAILED(hr))
 		{
@@ -167,43 +168,59 @@ int main() {
 
 		CEnumerateSerial::CPortsArray ports;
 		CEnumerateSerial::CPortAndNamesArray portAndNames;
-		CEnumerateSerial::CNamesArray names;
+
+		std::cout << "\n  ---------- CONNECTED DEVICES ----------\n\n" << std::endl;
 
 		#ifndef NO_CENUMERATESERIAL_USING_WMI
-		_tprintf(_T("\n  The following COM devices are currently connected to your PC."));
 		hr = CEnumerateSerial::UsingWMI(portAndNames);
 		if (SUCCEEDED(hr))
 		{
-			int i = 0;
 
-			printf("\n\n\n  ---------- BEGIN CONNECTED DEVICES ----------\n\n\n");
 			for (const auto& port : portAndNames) {
-				_tprintf(_T("  > COM%u <%s>"), port.first, port.second.c_str());
+				std::string parseCom = port.second;
+				std::size_t found = parseCom.find("DJI");
+					if (found != std::string::npos) {
+						std::cout << "  " << port.second << std::endl;
+						portNr = port.first;
+					}
 			}
-			printf("\n\n\n  ---------- END  CONNECTED  DEVICES ----------\n\n\n");
 		}
 		else
-			_tprintf(_T("  mDjiController was not able to scan your ports\n\n  Device manager > View > Show Hidden > Ports COM & LPT\n  > DJI USB Virtual COM(COM#) <- THIS NUMBER!"), hr);
+			_tprintf(_T("  ERROR scanning ports!"), hr);
 		#endif //#ifndef NO_CENUMERATESERIAL_USING_WMI
 
 		CoUninitialize();
-		// END ENUMSER PORT SCAN
 
-
-		// Start user input for settings file.
-		printf("  What is your DJI Phantom Controller (COM#) number? : ");
-
-		std::getline(std::cin, in);
-		portNr = atoi(in.c_str());
-
-		if (portNr < 1) {
-			portNr = 1;
+		if (portNr == 0) {
+			std::cout << "  No DJI devices found!" << std::endl;
 		}
 
-		char port[100];
-		sprintf_s(port, "COM%d", portNr);
+		std::cout << "\n\n  ---------------------------------------\n\n" << std::endl;
 
-		printf("\n\n  Set your vJoy virtual controller number (default set to 1): ");
+
+
+		// Start user input for settings.
+		if (portNr != 0) {
+			std::cout << "  We found a DJI device attached at COM" << portNr << "\n\n" << std::endl;
+			printf("  ");
+			system("pause"); 
+
+		}
+		else {
+
+			std::cout << "  No DJI devices attached, please make sure\n  that you have the following software pre-installed\n\n   > DJI WIN driver\n   > DJI Assistant 2 (Version 1.0.5 tested)\n\n" << std::endl;
+
+			printf("  ");
+			system("pause");
+
+			return 0;
+
+		}
+
+		ClearScreen();
+
+		// User sets the vJoy controller number
+		printf("\n\n  What vJoy controller should we attach to? (default set to 1): ");
 		std::getline(std::cin, in);
 		stickId = atoi(in.c_str());
 
@@ -211,19 +228,42 @@ int main() {
 			stickId = 1;
 		}
 
-		// Create a file to store settings in
-		std::ofstream writeSettings("settings.mdji");
+		char port[100];
+		sprintf_s(port, "COM%d", portNr);
 
-		if (!writeSettings) {
-			printf("  Error Opening settings.mdji\n\n");
-		}
-		else {
-			writeSettings << portNr << std::endl << stickId << std::endl << logging << std::endl;
-			writeSettings.close();
+		// Create a file to store settings in if they want.
+		while (saveSettings != "y" || saveSettings != "n") {
 
-			printf("\n  Starting...\n\n");
-			run(port, stickId, logging);
-			printf("\n  Closing down...\n\n");
+			std::cout << "\n\n  Save settings for auto start next time? ( y or n ) : ";
+			std::getline(std::cin, saveSettings);
+
+			if (saveSettings == "y") {
+
+				std::ofstream writeSettings("settings.mdji");
+
+				if (!writeSettings) {
+					printf("  Error Opening settings.mdji\n\n");
+				}
+				else {
+					writeSettings << portNr << std::endl << stickId << std::endl << logging << std::endl;
+					writeSettings.close();
+
+					printf("\n  Starting...\n\n");
+					run(port, stickId, logging);
+					printf("\n  Closing down...\n\n");
+				}
+
+			}
+			else if (saveSettings == "n") {
+
+				printf("\n  Starting...\n\n");
+				run(port, stickId, logging);
+				printf("\n  Closing down...\n\n");
+
+			}
+
+			ClearScreen();
+
 		}
 	}
 

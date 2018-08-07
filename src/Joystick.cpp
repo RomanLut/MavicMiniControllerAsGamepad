@@ -14,7 +14,7 @@ Joystick::Joystick(int id, int logging)
 		printf("  vJoy driver not enabled: Failed Getting vJoy attributes.\n");
 		return;
 	} else {
-		printf("  Driver found:\n  Vendor:%S, Product:%S, Ver:%S\n", TEXT(GetvJoyManufacturerString()), TEXT(GetvJoyProductString()), TEXT(GetvJoySerialNumberString()));
+		printf("  vJoy Driver found\n");
 	};
 
 	VjdStat status = GetVJDStatus(interfaceId);

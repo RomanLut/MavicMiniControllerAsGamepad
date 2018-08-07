@@ -80,7 +80,7 @@ Serial::~Serial()
 		this->connected = false;
 		//Close the serial handler
 		CloseHandle(this->hSerial);
-		printf("Closed serial connection\n");
+		printf("  Closed serial connection\n");
 	}
 }
 

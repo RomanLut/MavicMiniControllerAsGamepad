@@ -213,7 +213,7 @@ to maintain a single distribution point for the source code.
 
 /////////////////////////////////  Includes  //////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "enumser.h"
 
 
