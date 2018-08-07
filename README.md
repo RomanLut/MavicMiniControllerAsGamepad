@@ -18,8 +18,9 @@ Installation / Usage
 
 In order for it to work, the original drivers from DJI must be installed, and something called vJoy.
 
-* Download mDjiController.zip from above ( https://github.com/Matsemann/mDjiController/blob/master/mDjiController.zip?raw=true )
-* Download DJI WIN Driver and DJI Assistant 2 ( only version 1.0.5 has been tested ) Installer from here: http://www.dji.com/product/phantom-2/download
+* Download mDjiController.zip ( clone or download zip of repo and find the zip inside )
+* Download DJI WIN Driver Installer from here: https://www.dji.com/phantom-2/info#downloads
+* Download DJI Assistant 2 from here: https://www.dji.com/mavic/info#downloads
 * Download vJoy from here: http://vjoystick.sourceforge.net/site/index.php/download-a-install/72-download
 
   ! NOTE: DJI Assistant 2 and Vjoy apps do not need to be running to use this program. ( DJI Assistant cannot be running ).
