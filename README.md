@@ -9,7 +9,7 @@ This is a program that connects to your DJI Phantom Remote Controller (RC),
 reads the stick positions and tells Windows that position. A simplified, wannabe driver.
 
 In use:
-![](https://raw.githubusercontent.com/Matsemann/mDjiController/master/in_use.png)
+![](https://raw.githubusercontent.com/slaterbbx/mDjiController/master/in_use.png)
 
 Playing LiftOff / Drone simulators with a DJI controller.
 
