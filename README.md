@@ -16,7 +16,7 @@ How does it work?
 -----------------
 
 * Mavic Mini 1 Controller is not recognized as Gamepad on windows. 
-* It has COM port interface only.
+* It has Serial Port interface only.
 * It is possible to ask the controller for its status. 
 * So this program continuously reads the status and pass sticks and buttons state to vJoy.
 * vJoy is a virtual joystick that can be installed on your computer. 
