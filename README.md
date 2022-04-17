@@ -70,11 +70,7 @@ TROUBLESHOOTING
 
 * Not all sticks or buttons work
  
-	*If they look correct in the log:*
 	Your vJoy configuration may be wrong. Open "Configure vJoy" and reset configuration 1.
-	*If they are NOT correct in the log:*
-	Your controller sends in a different format, so you need to figure that out, edit the code and recompile.
-	(A bit advanced)
 	
 FAQ
 ---------------
