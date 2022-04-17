@@ -1,49 +1,41 @@
-mDjiController
+Mavic Mini 1 Controller as Gamepad
 ===============
- - Connect your DJI Remote Controller to your PC and use it to play simulators.
- - Currently confirmed working controllers: DJI Phantom 2
+ - Connect your Mavic Mini 1 controller to your PC and use it to play simulators.
+ - Currently confirmed working controllers: MR1SD25
 -----------------------------------------------------------------------------
 
-
-This is a program that connects to your DJI Phantom Remote Controller (RC),
-reads the stick positions and tells Windows that position. A simplified, wannabe driver.
-
-In use:
-![](https://raw.githubusercontent.com/slaterbbx/mDjiController/master/in_use.png)
-
-Playing LiftOff / Drone simulators with a DJI controller.
-
-Installation / Usage
-------------
-
-In order for it to work, the original drivers from DJI must be installed, and something called vJoy.
-
-* Download mDjiController.zip ( clone or download zip of repo and find the zip inside )
-* Download DJI WIN Driver Installer from here: https://www.dji.com/phantom-2/info#downloads
-* Download DJI Assistant 2 from here: https://www.dji.com/mavic/info#downloads
-* Download vJoy from here: http://vjoystick.sourceforge.net/site/index.php/download-a-install/72-download
-
-  ! NOTE: DJI Assistant 2 and Vjoy apps do not need to be running to use this program. ( DJI Assistant cannot be running ).
-
-* Install all three.
-* Then connect your RC to your computer via USB and turn it on.
-
-* Run mDjiController.exe
-* For vJoy, write 1 unless you use vJoy already and have different configurations.
-
-Then open a simulator and calibrate the controller.
+Credits
+-----------------
+This program is heavily based on projects:
+mDjiController 
+https://github.com/Matsemann/mDjiController
+https://github.com/slaterbbx/mDjiController.fork
+MiniDjiController
+https://github.com/hjstn/miniDjiController
 
 How does it work?
 -----------------
 
-* It is possible to ask the controller for its status when it's connected. So this program continuously
-	reads the status. It connects through COM. The output from the controller is just a list of numbers,
-	but sampling many enough such lists it's easy to see a pattern for which number means what. The biggest issue
-	was that the numbers are little endian encoded and uses two's complement, so it took some time to understand how
-	each number behaved.
+* Mavic Mini 1 Controller is not recognized as Gamepad on windows. 
+* It has COM port interface only.
+* It is possible to ask the controller for its status. 
+* So this program continuously reads the status and pass sticks and buttons state to vJoy.
+* vJoy is a virtual joystick that can be installed on your computer. 
+* Windows think it's a normal joystick. 
 
-* vJoy is a virtual joystick that can be installed on your computer. Windows think it's a normal joystick. mDjiController
-	takes the stick positions from the controller and tells Windows that this virtual joystick has the same positions.
+
+Installation / Usage
+------------
+
+* Download MavicMiniControllerAsGamepad.zip from Releases
+* Download vJoy from here: https://sourceforge.net/projects/vjoystick/files/latest/download
+
+* Install vJoy.
+* Then connect your RC to your computer via USB and turn it on.
+* Unzip MavicMiniControllerAsGamepad.zip to some folder
+* Run MavicControllerAsGamepad.exe, watch console window, let it running.
+
+Then open a simulator and calibrate the controller.
 
 
 TROUBLESHOOTING
@@ -51,18 +43,13 @@ TROUBLESHOOTING
 * COM can't connect
 	Open up device-manager.
 	You should see a category named ( View < Show Hidden ) "Ports (COM & LPT) and then a device named "DJI USB Virtual COM (COMX)"
-	If there is nothing there, the driver and Assistant from DJI are not installed correctly.
-
-	The DJI Assistant Software does not need to be running, only installed, make sure they are not running, as this program
-	cannot connect then.
 
 * vJoy can't connect
 	The error message should tell you if it's installed or not. Install the vJoy driver if it's not there.
 
 * Not all sticks or buttons work
 	*If they look correct in the log:*
-	Your vJoy configuration may be wrong. Open "Configure vJoy" and reset configuration 1, or make a new one
-	and tell mDjiController.exe to use that configuration.
+	Your vJoy configuration may be wrong. Open "Configure vJoy" and reset configuration 1.
 	*If they are NOT correct in the log:*
 	Your controller sends in a different format, so you need to figure that out, edit the code and recompile.
 	(A bit advanced)
