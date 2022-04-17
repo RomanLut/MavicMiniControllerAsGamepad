@@ -26,7 +26,7 @@ How does it work?
 Installation / Usage
 ------------
 
-* Download MavicMiniControllerAsGamepad.zip from Releases
+* Download MavicMiniControllerAsGamepad.zip https://github.com/RomanLut/MavicMiniControllerAsGamepad/releases
 * Download vJoy from here: https://sourceforge.net/projects/vjoystick/files/latest/download
 
 * Install vJoy.
