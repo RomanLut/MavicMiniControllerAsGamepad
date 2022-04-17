@@ -8,12 +8,9 @@ Credits
 -----------------
 This program is heavily based on projects:
 
-mDjiController 
-https://github.com/Matsemann/mDjiController
-https://github.com/slaterbbx/mDjiController.fork
-
-MiniDjiController
-https://github.com/hjstn/miniDjiController
+* mDjiController https://github.com/Matsemann/mDjiController
+* mDjiController.fork https://github.com/slaterbbx/mDjiController.fork
+* MiniDjiController https://github.com/hjstn/miniDjiController
 
 How does it work?
 -----------------
