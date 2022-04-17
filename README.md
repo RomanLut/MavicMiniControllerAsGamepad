@@ -12,7 +12,7 @@ This program is heavily based on projects:
 * mDjiController.fork https://github.com/slaterbbx/mDjiController.fork
 * MiniDjiController https://github.com/hjstn/miniDjiController
 
-How does it work?
+How does it work?value if axis rize. If stick is pushed down, value of axis decrease.
 -----------------
 
 * Mavic Mini 1 Controller is not recognized as Gamepad on windows. 
@@ -21,6 +21,25 @@ How does it work?
 * So this program continuously reads the status and pass sticks and buttons state to vJoy.
 * vJoy is a virtual joystick that can be installed on your computer. 
 * Windows think it's a normal joystick. 
+
+Available controls
+------------------
+* Left stick is X and Y axis (Axis 1 and 2)
+* Right stick is RX and RY axis (Axis 1 and 2)
+* Camera wheel is Z axis
+* Record button (Left bumper) is Button 1
+* Photo button (Right bumper) is Button 2
+* Home button is Button 3
+
+* Additionally, Left Sitck Y is reflected as **additive** axis SL0. **Additive** means that when Stick is pushed up, value of axis increase. If stick is pushed down, value of axis decrease. While stick is centered, value stay at last level. Left stick is self-centered physically. It is better to use axis SL0 as Thrust axis in airplane simulators, without a need to hold stick is specific position constantly.
+
+* The same feature is implemented with Camera wheel and axis SL1
+
+* Home button is reflected as 3-position switch on axis Z.
+
+* Record, Photo and Home buttons are reflecread as on/off switches on buttons 4,5,6.
+
+Run "vJoy Monitor" tool to check gamepad functionality.
 
 
 Installation / Usage
