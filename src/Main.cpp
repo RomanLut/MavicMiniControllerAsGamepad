@@ -12,6 +12,8 @@
 #include "clearscreen.h"
 #include "enumser.h"
 
+#include "..\resource\resource.h"
+
 // Check if settings.mdji exists
 bool fileExists(const std::string& filename) {
 	struct stat buf;

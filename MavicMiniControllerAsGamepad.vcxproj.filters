@@ -37,24 +37,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src/*.*">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src/*.*">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src/*.*">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src/*.*">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="inc\enumser\enumser.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="inc\enumser\StdAfx.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="inc/enumser/*.*">
       <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="src/*.cpp">
@@ -81,5 +66,41 @@
     <ClCompile Include="src/*.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src/*.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src/*.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src/*.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src/*.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src/*.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src/*.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource\resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource\Resource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="mainIcon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\mainIcon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

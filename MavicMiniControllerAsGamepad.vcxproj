@@ -163,6 +163,16 @@
     <ClCompile Include="inc/*.cpp" />
     <ClCompile Include="inc/enumser/*.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource\resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource\Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="mainIcon.ico" />
+    <Image Include="resource\mainIcon.ico" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
