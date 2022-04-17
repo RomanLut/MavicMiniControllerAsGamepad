@@ -52,3 +52,8 @@ TROUBLESHOOTING
 	*If they are NOT correct in the log:*
 	Your controller sends in a different format, so you need to figure that out, edit the code and recompile.
 	(A bit advanced)
+	
+FAQ
+---------------
+* Q: Controller is beeping on turon on, button press and after period of inactivity. Can I mute all sounds?
+* A: Unfortunatelly, not. You can remove beeper or silence it phisically only https://www.youtube.com/watch?v=qogsJXRU8HM
