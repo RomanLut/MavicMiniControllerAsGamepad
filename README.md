@@ -59,14 +59,17 @@ Then open a simulator and calibrate the controller.
 TROUBLESHOOTING
 ---------------
 * COM can't connect
+ 
 	Open up device-manager.
 	You should see a category named ( View < Show Hidden ) "Ports (COM & LPT) and then a device named "DJI USB Virtual COM (COMX)"
 
 * vJoy can't connect
+ 
 	The error message should tell you if it's installed or not. Install the vJoy driver if it's not there.
 	Note you can use tool named "vJoy Monitor" too see the state of virtual joystick. Tool is installed with vJoy.
 
 * Not all sticks or buttons work
+ 
 	*If they look correct in the log:*
 	Your vJoy configuration may be wrong. Open "Configure vJoy" and reset configuration 1.
 	*If they are NOT correct in the log:*
