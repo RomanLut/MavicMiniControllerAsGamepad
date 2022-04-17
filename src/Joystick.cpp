@@ -1,14 +1,31 @@
 #include "Joystick.h"
+#include "winnt.h"
 #include "vjoyinterface.h"
 
 Joystick::Joystick(int id, int logging)
 {
 	interfaceId = id;
-	if (logging == 0) {
+	if (logging == 1) {
 		log = true;
 	}
 
-	printf("  Creating vJoy connection\n");
+	this->thrustValue = 0;
+	this->thrustSpeed = 0;
+
+	this->cameraValue = 0;
+	this->cameraSpeed = 0;
+
+	this->homeValue = 16384;
+	this->lastButtonHome = false;
+
+	this->lastButtonLB = false;
+	this->lastButtonRB = false;
+
+	this->switchHome = false;
+	this->switchLB = false;
+	this->switchRB = false;
+
+	printf("Creating vJoy connection\n");
 
 	if (!vJoyEnabled()) {
 		printf("  vJoy driver not enabled: Failed Getting vJoy attributes.\n");
@@ -48,93 +65,98 @@ Joystick::Joystick(int id, int logging)
 	}
 }
 
-void Joystick::update(int l_hor, int l_ver, int r_hor, int r_ver, int lever_left, int lever_right, int camera)
+void Joystick::update(int l_hor, int l_ver, int r_hor, int r_ver, int camera, bool buttonLB, bool buttonRB, bool buttonHome)
 {
-	// Values must be between 0x0 and 0x8000
-	// The values from the controller are between -1000 and 1000, so we just scale them between 0 and 16000 (maximum range in vJoyMonitor)	
-	l_hor += 1000;
-	l_ver += 1000;
-	r_hor += 1000;
-	r_ver += 1000;
-	camera -= 1000;
+	l_hor -= 364;
+	l_ver -= 364;
+	r_hor -= 364;
+	r_ver -= 364;
+	camera -= 364;
 
-	l_hor *= 16;
-	l_ver *= 16;
-	r_hor *= 16;
-	r_ver *= 16;
-	camera *= -16; // negative multiplication to make the value feel natural (left = negative | right = positive)
-	
+	l_hor *= 4096;
+	l_ver *= 4096;
+	r_hor *= 4096;
+	r_ver *= 4096;
+	camera *= 4096;
+
+	l_hor /= 165;
+	l_ver /= 165;
+	r_hor /= 165;
+	r_ver /= 165;
+	camera /= 165;
+
+	this->thrustSpeed = l_ver;
+	this->cameraSpeed = camera;
+
+	if (!this->lastButtonHome &&  buttonHome)
+	{
+		if (this->homeValue == 0) this->homeValue = 16384;
+		else if (this->homeValue == 16384) this->homeValue = 32768;
+		else this->homeValue = 0;
+
+		this->switchHome ^= true;
+	}
+	this->lastButtonHome = buttonHome;
+
+	if (!this->lastButtonLB && buttonLB)
+	{
+		this->switchLB ^= true;
+	}
+	this->lastButtonLB = buttonLB;
+
+	if (!this->lastButtonRB && buttonRB)
+	{
+		this->switchRB ^= true;
+	}
+	this->lastButtonRB = buttonRB;
+
 	// center all sticks for users who fly with no springs at all (for calibration or to scratch your nose)
 	// set camera to max (right) and flip left and right switches down fully to center sticks data.
 
 	int range_max = 32000;
 	int center_sticks = range_max / 2;
 
-	if ((camera == range_max && lever_left > 0) && (lever_right > 0)) {
-		l_hor = center_sticks;
-		l_ver = center_sticks;
-		r_hor = center_sticks;
-		r_ver = center_sticks;
-	}
-	else {
-		// Read values from left lever
-		// -numbers = 'OFF' position | 0 = 'CL' position | +numbers = 'HL' position
-		if (lever_left < 0) {
-			button_1 = true;
-			button_2 = false;
-			button_3 = false;
-		}
-		else if (lever_left > 0) {
-			button_1 = false;
-			button_2 = false;
-			button_3 = true;
-		} // else remain as before, sometimes this value is a bit weird
-		else {
-			button_1 = false;
-			button_2 = true;
-			button_3 = false;
-		}
-
-		// Read values from right lever
-		// -numbers = 'GPS' position | 0 = 'ATTI' position | +numbers = 'ATTI' position
-		if (lever_right < 0) {
-			button_4 = true;
-			button_5 = false;
-			button_6 = false;
-		}
-		else if (lever_right > 0) {
-			button_4 = false;
-			button_5 = false;
-			button_6 = true;
-		} // else remain as before, sometimes this value is a bit weird
-		else {
-			button_4 = false;
-			button_5 = true;
-			button_6 = false;
-		}
-	}
+	button_1 = buttonLB;
+	button_2 = buttonRB;
+	button_3 = buttonHome;
 
 	if (log)
-		printf("\n  mDjiController : \n\n  L vert: %-5d | L hori: %-5d | R vert: %-5d | R hori: %-5d | camera: %-5d \n  btn1: %-d | btn2: %-d | btn3: %-d | btn4: %-d | btn5: %-d | btn6: %-d \n", l_ver, l_hor, r_ver, r_hor, camera, button_1, button_2, button_3, button_4, button_5, button_6);
+		printf("\n  mDjiController : \n\n  L vert: %-5d | L hori: %-5d | R vert: %-5d | R hori: %-5d | camera: %-5d \n  btn1: %-d | btn2: %-d | btn3: %-d \n", l_ver, l_hor, r_ver, r_hor, camera, button_1, button_2, button_3 );
 
 	// Send stick values to vJoy
 	SetAxis(l_hor, interfaceId, HID_USAGE_X);
 	SetAxis(l_ver, interfaceId, HID_USAGE_Y);
-	SetAxis(r_hor, interfaceId, HID_USAGE_Z);
-	SetAxis(r_ver, interfaceId, HID_USAGE_RX);
-	SetAxis(camera, interfaceId, HID_USAGE_RY);
-	
+	SetAxis(r_hor, interfaceId, HID_USAGE_RX);
+	SetAxis(r_ver, interfaceId, HID_USAGE_RY);
+	SetAxis(camera, interfaceId, HID_USAGE_Z);
+	SetAxis(this->homeValue, interfaceId, HID_USAGE_RZ);
+
 	// Send button values to vJoy
 	SetBtn(button_1, interfaceId, 1);
 	SetBtn(button_2, interfaceId, 2);
 	SetBtn(button_3, interfaceId, 3);
-	SetBtn(button_4, interfaceId, 4);
-	SetBtn(button_5, interfaceId, 5);
-	SetBtn(button_6, interfaceId, 6);
+	SetBtn(this->switchLB, interfaceId, 4);
+	SetBtn(this->switchRB, interfaceId, 5);
+	SetBtn(this->switchHome, interfaceId, 6);
 }
+
+void Joystick::tick()
+{
+	this->thrustValue += (this->thrustSpeed -16384)/ 50;
+	if (this->thrustValue < 0) this->thrustValue = 0;
+	if (this->thrustValue > 32768) this->thrustValue = 32768;
+	SetAxis(this->thrustValue, interfaceId, HID_USAGE_SL0);
+
+	this->cameraValue += (this->cameraSpeed - 16384) / 50;
+	if (this->cameraValue < 0) this->cameraValue = 0;
+	if (this->cameraValue > 32768) this->cameraValue = 32768;
+	SetAxis(this->cameraValue, interfaceId, HID_USAGE_SL1);
+}
+
 
 Joystick::~Joystick()
 {
 	RelinquishVJD(interfaceId);
 	printf("  Disconnected from joystick\n");
 }
+

@@ -9,6 +9,8 @@
 #define HID_USAGE_RX	0x33
 #define HID_USAGE_RY	0x34
 #define HID_USAGE_RZ	0x35
+#define HID_USAGE_SL0	0x36
+#define HID_USAGE_SL1	0x37
 
 class Joystick
 {
@@ -17,9 +19,22 @@ private:
 	bool connected;
 	unsigned int interfaceId;
 	bool log = false;
+	int thrustValue;
+	int thrustSpeed;
+	int cameraValue;
+	int cameraSpeed;
+	bool lastButtonHome;
+	bool lastButtonLB;
+	bool lastButtonRB;
+
+	bool switchHome;
+	bool switchLB;
+	bool switchRB;
+	int homeValue;
 public:
 	Joystick(int interfaceId, int logging);
 	~Joystick();
-	void update(int l_hor, int l_ver, int r_hor, int r_ver, int toggle_left, int toggle_right, int camera);
+	void update(int l_hor, int l_ver, int r_hor, int r_ver, int camera, bool buttonLB, bool buttonRB, bool buttonHome);
 	bool isConnected() { return connected;  }
+	void tick();
 };

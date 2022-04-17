@@ -32,14 +32,20 @@ short littleEndiansToShort(int first, int second) {
 // Run the program loop for controller data
 void run(char* portName, int stickId, int logging) {
 
-	char initData[] = { 0x55, 0xaa, 0x55, 0xaa, 0x1e, 0x00, 0x01, 0x00, 0x00, 0x01, 0x01, 0x00, 0x80, 0x00, 0x04, 0x04, 0x74, 0x94, 0x35, 0x00, 0xd8, 0xc0, 0x41, 0x00, 0x30, 0xf6, 0x08, 0x00, 0x00, 0xf6, 0x69, 0x9c, 0x01, 0xe8};
-	char pingData[] = { 0x55, 0xaa, 0x55, 0xaa, 0x1e, 0x00, 0x01, 0x00, 0x00, 0x1c, 0x02, 0x00, 0x80, 0x00, 0x06, 0x01, 0x28, 0x97, 0xae, 0x03, 0x28, 0x36, 0xa4, 0x03, 0x28, 0x36, 0xa4, 0x03, 0xab, 0xa7, 0x30, 0x00, 0x03, 0x53};
+	//unsigned char pingData[] = { 0x55, 0x0d, 0x04, 0x33, 0x0a, 0x0e, 0x04, 0x00, 0x40, 0x06, 0x27, 0x1c, 0x3e };
+	//unsigned char pingData[] = { 0x55, 0x0d, 0x04, 0x33, 0x0a, 0x0e, 0x05, 0x00, 0x40, 0x06, 0x01, 0x6c, 0x71 };
 
-	char incomingData[256] = "";
-	int dataLength = 256;
+	unsigned char pingData[] = { 0x55, 0x0d, 0x04, 0x33, 0x0a, 0x0e, 0x03, 0x00, 0x40, 0x06, 0x01, 0xf4, 0x4a };
+	int pingDataLen = 13;
+
+	unsigned char pingData2[] = { 0x55, 0x0d, 0x04, 0x33, 0x0a, 0x0e, 0x02, 0x00, 0x40, 0x06, 0x27, 0x84, 0x05 };
+	int pingData2Len = 13;
+
+	unsigned char incomingData[256] = "";
+	int bufferLength = 256;
+	int dataLength = 0;
 	int readResult = 0;
 	bool shouldRun = true;
-
 
 	Joystick j(stickId, logging);
 	if (!j.isConnected()) {
@@ -55,43 +61,120 @@ void run(char* portName, int stickId, int logging) {
 	}
 
 	printf("\n  Everything is ready\n\n");
-	s.WriteData(initData, 34);
 
-	printf("  Running...\n\n  Press END key to quit\n\n");
-	Sleep(4000);
+	printf("  Running...\n\n  Press Ctrl+C to quit\n\n");
+	Sleep(1000);
+
+	bool buttonLB = false;
+	bool buttonRB = false;
+	bool buttonHome = false;
+
+	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
+
+	int timeoutCount = 0;
+	int timeoutCount2 = 0;
+
+	int errorCount = 0;
 
 	while (s.IsConnected() && shouldRun)
 	{
-
-		s.WriteData(pingData, 34); // write this once in a while, otherwise it stops sending? :O
-		readResult = s.ReadData(incomingData, dataLength);
-
-		if (readResult == 76 && incomingData[0] == 0x55) { // probably positioning data
-			short left_vertical = littleEndiansToShort(incomingData[39], incomingData[40]);
-			short left_horizontal = littleEndiansToShort(incomingData[43], incomingData[44]);
-
-			short right_horizontal = littleEndiansToShort(incomingData[31], incomingData[32]);
-			short right_vertical = littleEndiansToShort(incomingData[35], incomingData[36]);
-
-			short left_lever = littleEndiansToShort(incomingData[47], incomingData[48]);
-			short right_lever = littleEndiansToShort(incomingData[51], incomingData[52]);
-
-			short camera = littleEndiansToShort(incomingData[55], incomingData[56]);
-
-			ClearScreen();
-
-			// update our virtual joystick
-			j.update(left_horizontal, left_vertical, right_horizontal, right_vertical, left_lever, right_lever, camera);
-			
+		timeoutCount++;
+		if (timeoutCount == 2 )
+		{
+			timeoutCount = 0;
+			if (s.WriteData(pingData, pingDataLen))
+			{
+				errorCount = 0;
+			}
+			else
+			{
+				errorCount++;
+				if (errorCount == 200)
+				{
+					printf("\n\n  Device disconnected!\n\n");
+					return;
+				}
+			}
+		}
+		
+		timeoutCount2++;
+		if (timeoutCount2 == 5)
+		{
+			s.WriteData(pingData2, pingData2Len);
+			timeoutCount2 = 0;
 		}
 
+		Sleep(5);
+		readResult = s.ReadData(&incomingData[dataLength], bufferLength - dataLength);
+		dataLength += readResult;
+
+		if (logging && readResult > 0 )
+		{
+			printf("\n\n");
+			for (int i = 0; i < dataLength; i++)
+			{
+				printf("%02X ", (i & 0xff));
+			}
+			printf("\n");
+			for (int i = 0; i < dataLength; i++)
+			{
+				printf("%02X ", incomingData[i]);
+			}
+			printf("\n\n");
+		}
+
+		//discard any trash and unknown packets
+		if (dataLength >= 2 && incomingData[0] == 0x55 && incomingData[1] != 0x26 && incomingData[1] != 0x3a) {
+			incomingData[0] = 0;
+		}
+		while (dataLength > 0 && incomingData[0] != 0x55)
+		{
+			dataLength--;
+			memcpy(incomingData, incomingData + 1, dataLength);
+		}
+		
+		//pingData2 responce
+		//it contains uncalibrated Axis values and button flags
+		if (dataLength >= 0x3a  && incomingData[0] == 0x55 && incomingData[1] == 0x3A ) {
+			buttonLB = (incomingData[0x1d] & 0x40) != 0;
+			buttonRB = (incomingData[0x1d] & 0x20) != 0;
+			buttonHome = (incomingData[0x1d] & 0x80) != 0;
+
+			dataLength -= 0x3a;
+			memcpy(incomingData, incomingData + 0x3a, dataLength);
+		}
+
+		//pingdata response
+		//contains calibrated axis values, no button flags
+		if (dataLength >=0x26  && incomingData[0] == 0x55 && incomingData[1] == 0x26) {
+			short left_vertical = littleEndiansToShort(incomingData[19], incomingData[20]);
+			short left_horizontal = littleEndiansToShort(incomingData[22], incomingData[23]);
+
+			short right_horizontal = littleEndiansToShort(incomingData[13], incomingData[14]);
+			short right_vertical = littleEndiansToShort(incomingData[16], incomingData[17]);
+
+			short camera = littleEndiansToShort(incomingData[25], incomingData[26]);
+
+			dataLength -= 0x26;
+			memcpy(incomingData, incomingData + 0x26, dataLength);
+
+			if (logging)
+			{
+				ClearScreen();
+			}
+
+			// update our virtual joystick
+			j.update(left_horizontal, left_vertical, right_horizontal, right_vertical, camera, buttonLB, buttonRB, buttonHome);
+		}
+
+		/*
 		if (GetAsyncKeyState(VK_END)) {
 			shouldRun = false;
 			printf("\n\n  Detected END key, quitting...\n");
 		}
+		*/
 
-
-		Sleep(20);
+		j.tick();
 	}
 
 }
@@ -105,8 +188,32 @@ int main() {
 	std::string in;
 	std::string saveSettings = "o";
 
+	ClearScreen();
+/*
+    CONSOLE_FONT_INFOEX cfi;
+    cfi.cbSize = sizeof cfi;
+    cfi.nFont = 0;
+    cfi.dwFontSize.X = 0;
+    cfi.dwFontSize.Y = 20;
+    cfi.FontFamily = FF_DONTCARE;
+    cfi.FontWeight = FW_NORMAL;
+
+    wcscpy_s(cfi.FaceName, LF_FACESIZE, L"Lucida Console");
+    SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &cfi);
+*/
+
+	printf("    ________                                              .___\n");
+	printf("   /  _____/ _____     _____    ____  ______  _____     __| _/\n");
+	printf("  /   \\  ___ \\__  \\   /     \\ _/ __ \\ \\____ \\ \\__  \\   / __ | \n");
+	printf("  \\    \\_\\  \\ / __ \\_|  Y Y  \\\\  ___/ |  |_> > / __ \\_/ /_/ | \n");
+	printf("   \\______  /(____  /|__|_|  / \\___  >|   __/ (____  /\\____ |\n");
+	printf("          \\/      \\/       \\/      \\/ |__|         \\/      \\/ \  v1.0\n");
+	printf("\n");
+
+
 	// Check if settings file exists, if so, open it and plug in the info.
 	// If not, run the setup to create the settings file.
+	/*
 	if (fileExists ("settings.mdji")) {
 		std::ifstream readSettings("settings.mdji");
 		if (!readSettings) {
@@ -136,8 +243,9 @@ int main() {
 		printf("\n  Closing down...\n\n");
 
 	}
-	else {
+	else*/ {
 
+		/*
 		// No file exists, so user can input data.
 		printf("\n  !!! If you input incorrect data, delete the settings.mdji file. !!!\n\n   NOTE: DJI_WIN Driver must be installed.\n   NOTE: DJI Assistant 2 Must be installed - Version 1.0.5 tested.\n   NOTE: vJoy must be installed.\n\n   !IMPORTANT! - DJI Assistant cannot be running at the same time\n   as this program or it will not connect.\n\n  After the above is installed correctly,\n  Turn on your connected DJI Phantom 2 Controller.\n  Once your controller is on and connected, press enter.\n\n");
 
@@ -147,7 +255,7 @@ int main() {
 		// Clear screen to begin settings process
 		ClearScreen();
 
-
+		*/
 		/* Begin Enumser for auto device discovery.
 		Initialize COM (Required by CEnumerateSerial::UsingWMI) */
 		HRESULT hr = CoInitialize(nullptr);
@@ -169,7 +277,9 @@ int main() {
 		CEnumerateSerial::CPortsArray ports;
 		CEnumerateSerial::CPortAndNamesArray portAndNames;
 
-		std::cout << "\n  ---------- CONNECTED DEVICES ----------\n\n" << std::endl;
+		//std::cout << "\n  ---------- CONNECTED DEVICES ----------\n\n" << std::endl;
+
+		std::cout << "\n  Searching for connected DJI Mavic Mini 1 controllers..." << std::endl;
 
 		#ifndef NO_CENUMERATESERIAL_USING_WMI
 		hr = CEnumerateSerial::UsingWMI(portAndNames);
@@ -180,7 +290,7 @@ int main() {
 				std::string parseCom = port.second;
 				std::size_t found = parseCom.find("DJI");
 					if (found != std::string::npos) {
-						std::cout << "  " << port.second << std::endl;
+						std::cout << "  =>" << port.second << std::endl;
 						portNr = port.first;
 					}
 			}
@@ -191,24 +301,24 @@ int main() {
 
 		CoUninitialize();
 
+		/*
 		if (portNr == 0) {
 			std::cout << "  No DJI devices found!" << std::endl;
 		}
+		*/
 
-		std::cout << "\n\n  ---------------------------------------\n\n" << std::endl;
-
-
+		//std::cout << "\n\n  ---------------------------------------\n\n" << std::endl;
 
 		// Start user input for settings.
 		if (portNr != 0) {
-			std::cout << "  We found a DJI device attached at COM" << portNr << "\n\n" << std::endl;
+			std::cout << "  Found controller at COM" << portNr << " :)\n" << std::endl;
 			printf("  ");
-			system("pause"); 
+			//system("pause"); 
 
 		}
 		else {
 
-			std::cout << "  No DJI devices attached, please make sure\n  that you have the following software pre-installed\n\n   > DJI WIN driver\n   > DJI Assistant 2 (Version 1.0.5 tested)\n\n" << std::endl;
+			std::cout << "  No Mavic Mini 1 controllers found:(\n\n" << std::endl;
 
 			printf("  ");
 			system("pause");
@@ -217,12 +327,13 @@ int main() {
 
 		}
 
-		ClearScreen();
+		//ClearScreen();
 
 		// User sets the vJoy controller number
-		printf("\n\n  What vJoy controller should we attach to? (default set to 1): ");
-		std::getline(std::cin, in);
-		stickId = atoi(in.c_str());
+		//printf("\n\n  What vJoy controller should we attach to? (default set to 1): ");
+		//std::getline(std::cin, in);
+		//stickId = atoi(in.c_str());
+		stickId = 1;
 
 		if (stickId < 1) {
 			stickId = 1;
@@ -231,6 +342,7 @@ int main() {
 		char port[100];
 		sprintf_s(port, "COM%d", portNr);
 
+		/*
 		// Create a file to store settings in if they want.
 		while (saveSettings != "y" || saveSettings != "n") {
 
@@ -265,6 +377,12 @@ int main() {
 			ClearScreen();
 
 		}
+		*/
+
+		//ShowWindow(GetConsoleWindow(), SW_SHOW);
+
+		run(port, stickId, logging);
+
 	}
 
 	printf("  ");

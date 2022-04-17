@@ -19,7 +19,7 @@ private:
 public:
 	Serial(char *portName);
 	~Serial();
-	int ReadData(char *buffer, unsigned int nbChar);
-	bool WriteData(char *buffer, unsigned int nbChar);
+	int ReadData(unsigned char *buffer, unsigned int nbChar);
+	bool WriteData(unsigned char *buffer, unsigned int nbChar);
 	bool IsConnected();
 };

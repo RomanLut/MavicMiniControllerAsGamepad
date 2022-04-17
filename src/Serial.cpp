@@ -84,8 +84,10 @@ Serial::~Serial()
 	}
 }
 
-int Serial::ReadData(char *buffer, unsigned int nbChar)
+int Serial::ReadData(unsigned char *buffer, unsigned int nbChar)
 {
+
+	if (nbChar == 0) return 0;
 	//Number of bytes we'll have read
 	DWORD bytesRead;
 	//Number of bytes we'll really ask to read
@@ -114,16 +116,15 @@ int Serial::ReadData(char *buffer, unsigned int nbChar)
 		{
 			return bytesRead;
 		}
-
 	}
 
-	//If nothing has been read, or that an error was detected return -1
-	return -1;
+	//If nothing has been read, or that an error was detected return 0
+	return 0;
 
 }
 
 
-bool Serial::WriteData(char *buffer, unsigned int nbChar)
+bool Serial::WriteData(unsigned char *buffer, unsigned int nbChar)
 {
 	DWORD bytesSend;
 
