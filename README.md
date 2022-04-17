@@ -12,7 +12,7 @@ This program is heavily based on projects:
 * mDjiController.fork https://github.com/slaterbbx/mDjiController.fork
 * MiniDjiController https://github.com/hjstn/miniDjiController
 
-How does it work?value if axis rize. If stick is pushed down, value of axis decrease.
+How does it work?
 -----------------
 
 * Mavic Mini 1 Controller is not recognized as Gamepad on windows. 
