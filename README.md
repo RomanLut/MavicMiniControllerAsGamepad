@@ -2,6 +2,10 @@ Mavic Mini 1 Controller as Gamepad
 ===============
  - Connect your Mavic Mini 1 controller to your PC and use it to play simulators.
  - Currently confirmed working controllers: MR1SD25
+ 
+![alt text](https://raw.githubusercontent.com/RomanLut/MavicMiniControllerAsGamepad/master/img/photo1.jpg "Photo")
+
+
 -----------------------------------------------------------------------------
 
 Credits
@@ -55,6 +59,7 @@ Installation / Usage
 
 Then open a simulator and calibrate the controller.
 
+![alt text](https://raw.githubusercontent.com/RomanLut/MavicMiniControllerAsGamepad/master/img/screen1.png "Screen")
 
 TROUBLESHOOTING
 ---------------
