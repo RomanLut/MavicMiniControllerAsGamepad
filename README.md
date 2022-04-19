@@ -29,17 +29,17 @@ How does it work?
 Available controls
 ------------------
 * Left stick is X and Y axis (Axis 1 and 2)
-* Right stick is RX and RY axis (Axis 1 and 2)
-* Camera wheel is Z axis
+* Right stick is RX and RY axis (Axis 4 and 5)
+* Camera wheel is Z axis (Axis 3)
 * Record button (Left bumper) is Button 1
 * Photo button (Right bumper) is Button 2
 * Home button is Button 3
 
-* Additionally, Left Sitck Y is reflected as **additive** axis SL0. **Additive** means that when Stick is pushed up, value of axis increase. If stick is pushed down, value of axis decrease. While stick is centered, value stay at last level. Left stick is self-centered physically. It is better to use axis SL0 as Thrust axis in airplane simulators, without a need to hold stick is specific position constantly.
+* Additionally, Left Sitck Y is reflected as **additive** axis SL0 (Axis 7). **Additive** means that when Stick is pushed up, value of axis increase. If stick is pushed down, value of axis decrease. While stick is centered, value stay at last level. Left stick is self-centered physically. It is better to use axis SL0 as Thrust axis in airplane simulators, without a need to hold stick is specific position constantly.
 
-* The same feature is implemented with Camera wheel and axis SL1
+* The same feature is implemented with Camera wheel and axis SL1 (Axis 8)
 
-* Home button is reflected as 3-position switch on axis Z.
+* Home button is reflected as 3-position switch on axis RZ (Axis 6).
 
 * Record, Photo and Home buttons are reflecread as on/off switches on buttons 4,5,6.
 
