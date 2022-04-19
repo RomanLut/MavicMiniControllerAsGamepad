@@ -24,7 +24,7 @@ How does it work?
 * It is possible to ask the controller for its status. 
 * So this program continuously reads the status and pass sticks and buttons state to vJoy.
 * vJoy is a virtual joystick that can be installed on your computer. 
-* Windows think it's a normal joystick. 
+* Windows thinks it's a normal joystick. 
 
 Available controls
 ------------------
